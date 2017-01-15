@@ -2,7 +2,7 @@
 
 import sys, getopt, os, argparse
 
-def concat_species_genes(filenames, dir_name, flag):
+def concat_species_genes(filenames, dir_name, flag, filename):
 	""" (list of strings), str, str -> NoneType
 			Precondition: Each line with a species name is prefaced with a '>' 
 			character, and one gene is on the following line. 
@@ -12,17 +12,22 @@ def concat_species_genes(filenames, dir_name, flag):
 
 	# Build a dictionary of species names and genes
 	names = build_species_dict(filenames, dir_name)
+	header = ""
 
 	# Format names
-	if flag == '-t':
-		formatted_names = format_names_txt(names)
-	elif flag == '-f':
+	if flag == 'nexus':
+		header = create_nexus_header(names, filename)
+		formatted_names = format_names_nexus(names, filename)
+	elif flag == 'fasta':
+		formatted_names = format_names_fasta(names)
+	elif flag == 'phylip':
+		header = create_phy_header(names, filename)
 		formatted_names = format_names_fasta(names)
 	
 	formatted_names.sort()
 
 	# Write each species and gene line to an ouput text file.
-	write_genes(formatted_names, flag)
+	write_genes(formatted_names, flag, filename, header)
 
 def build_species_dict(filenames, dir_name):
 	""" (list of strings, string) -> dictionary
@@ -50,8 +55,6 @@ def build_species_dict(filenames, dir_name):
 			else:
 				names[name] += line.strip()
 
-		print(num_names, len(names.keys()))
-
 		# Raise an exception if all of the files don't have the same amount of species names, 
 		# which may suggest that there may be a spelling error on one of the names.
 		if filename == filenames[0]:
@@ -63,7 +66,7 @@ def build_species_dict(filenames, dir_name):
 
 	return names
 
-def format_names_txt(names):
+def format_names_nexus(names, filename):
 	""" (dictionary) -> list
 		Format each species name and genes into a single line.
 	"""
@@ -81,6 +84,33 @@ def format_names_txt(names):
 		formatted_names.append(formatted_name)
 
 	return formatted_names
+
+def format_names_phy(names, filename):
+	""" (dictionary) -> list
+		Format each species name and genes into a single line.
+	"""
+	
+	formatted_names = []
+
+	for key, value in names.items():
+		# Add the appropiate amount of spaces between the species name 
+		# and gene so that all the genes line up. 
+		num_spaces = longest_name_len - len(key)
+
+		formatted_name = key.strip() + ' ' + value.strip() + '\n'
+		formatted_names.append(formatted_name)
+
+	return formatted_names
+
+def create_nexus_header(names, filename):
+
+	header_format = "#NEXUS\n[TITLE: {0} ]\n\nbegin data;\ndimensions ntax={1} nchar={2};\nformat datatype=DNA missing=N gap=- interleave=yes;\n\nMatrix\n"
+
+	return header_format.format(filename, len(names.keys()), len(next(names.itervalues())))
+
+def create_phy_header(names, filename):
+
+	return " {0} {1}\n".format(len(names.keys()), len(next(names.itervalues())))
 
 def format_names_fasta(names):
 	""" (dictionary) -> list
@@ -109,17 +139,26 @@ def longest_name(names):
 
 	return longest_name
 
-def write_genes(names, flag):
-	""" (list of strings), string -> NoneType
+def write_genes(names, flag, filename, header):
+	""" (list of strings, string) -> NoneType
 		Write each line of the species name and genes to an output_file.
 	"""
 
-	if flag == '-f':
-		output_file = open("output.fas", 'w') 
-	elif flag == '-t':
-		output_file = open("output.txt", 'w') 
+	if flag == 'fasta':
+		output_file = open(filename + ".fas", 'w') 
+	elif flag == 'nexus':
+		output_file = open(filename + ".nex", 'w') 
+	elif flag == 'phylip':
+		output_file = open(filename + ".phy", 'w') 
+
+	output_file.write(header)
+
 	for name in names:
 		output_file.write(name)
+
+	if flag == 'nexus':
+		# For fasta file endings
+		output_file.write(";")
 
 	output_file.close()
 
@@ -127,18 +166,18 @@ if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='Builds gene super matrix.')
 	parser.add_argument('files', metavar='S', nargs='+',
                    help='A directory containing files with gene sequences')
-	parser.add_argument('--f', help='Sepcify output file type fasta', action="store_true")
-	parser.add_argument('--t', help='Sepcify output file type txt (default)', action="store_true")
+	parser.add_argument('--type', help='Sepcify output file type [fasta, nexus, phylip]')
+	parser.add_argument('--o', help='Sepcify output file name (default=output.fas')
 	args = parser.parse_args()
 	input_file_list = os.listdir(sys.argv[1])
 
-	flag = '-t'
-
-	if args.f:
-		flag = '-f'
+	if args.o is None:
+		args.o = 'output'
+	if args.type is None:
+		args.type = 'fasta'
 
 	# Check for '.DS_Store'
 	if '.DS_Store' in input_file_list:
 		input_file_list.remove('.DS_Store')
 
-	concat_species_genes(input_file_list, sys.argv[1], flag)
+	concat_species_genes(input_file_list, sys.argv[1], args.type, args.o)
