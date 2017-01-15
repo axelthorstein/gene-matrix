@@ -25,26 +25,39 @@ def concat_species_genes(filenames, dir_name, flag):
 	write_genes(formatted_names, flag)
 
 def build_species_dict(filenames, dir_name):
-	""" (list of strings) -> dictionary
+	""" (list of strings, string) -> dictionary
 		Builds a dictionary where the key is the name of the species and 
 		the value is the concatentation of all the genes associated with 
 		that species. 
 	"""
 	names = {}
 	name = ''
+	num_names = 0
 	
 	# Go through the file and concat all the genes associated to a species name
 	for filename in filenames:
+
+
 		input_file = open(dir_name + '/' + filename, 'r')
 		lines = input_file.readlines()
 
 		for line in lines:
+
 			if line[0] == '>': 
 				name = line[1:]
 				if name not in names:
 					names[name] = ''
 			else:
 				names[name] += line.strip()
+
+		print(num_names, len(names.keys()))
+
+		# Raise an exception if all of the files don't have the same amount of species names, 
+		# which may suggest that there may be a spelling error on one of the names.
+		if filename == filenames[0]:
+			num_names = len(names.keys())
+		elif num_names != len(names.keys()):
+			raise ValueError('One of the species names may be misspelled, or have a different number of species names in ' + filename)
 
 		input_file.close()
 
@@ -57,7 +70,7 @@ def format_names_txt(names):
 	
 	formatted_names = []
 
-	longest_name_len = longest_name(names.keys()) + 10 # Extra spacing
+	longest_name_len = longest_name(names.keys()) + 5 # Extra spacing
 
 	for key, value in names.items():
 		# Add the appropiate amount of spaces between the species name 
@@ -113,7 +126,7 @@ def write_genes(names, flag):
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='Builds gene super matrix.')
 	parser.add_argument('files', metavar='S', nargs='+',
-                   help='A file containing gene sequences')
+                   help='A directory containing files with gene sequences')
 	parser.add_argument('--f', help='Sepcify output file type fasta', action="store_true")
 	parser.add_argument('--t', help='Sepcify output file type txt (default)', action="store_true")
 	args = parser.parse_args()
