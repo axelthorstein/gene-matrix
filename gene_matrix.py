@@ -20,7 +20,10 @@ def concat_species_genes(filenames, dir_name, file_type, filename):
 	if file_type == 'fasta':
 		formatted_names = format_names("fasta", names)
 	elif file_type == 'nexus':
-		header = create_header("#NEXUS\n[TITLE: {0} ]\n\nbegin data;\ndimensions ntax={1} nchar={2};\nformat datatype=DNA missing=N gap=- interleave=yes;\n\nMatrix\n", 
+		header = create_header("#NEXUS\n[TITLE: {0} ]\n\nbegin data;\
+			\ndimensions ntax={1} nchar={2};\
+			\nformat datatype=DNA missing=N gap=- interleave=yes;\
+			\n\nMatrix\n", 
 		num_species, 
 		gene_length,
 		filename)
@@ -170,8 +173,10 @@ if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='Builds gene super matrix.')
 	parser.add_argument('files', metavar='S', nargs='+',
                    help='A directory containing files with gene sequences')
-	parser.add_argument('--type', choices=["fasta", "nexus", "phylip"], help='Sepcify output file type [fasta, nexus, phylip]')
-	parser.add_argument('--o', help='Sepcify output file name (default=output.fas')
+	parser.add_argument('--type', choices=["fasta", "nexus", "phylip"], 
+		help='Sepcify output file type [fasta, nexus, phylip]')
+	parser.add_argument('--o', 
+		help='Sepcify output file name (default=output.fas)')
 	args = parser.parse_args()
 	input_file_list = os.listdir(sys.argv[1])
 

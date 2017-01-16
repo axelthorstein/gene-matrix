@@ -25,6 +25,7 @@ Simply download the gene_matrix.py file and give it a directory that only contai
 ## Contributors
 
 Axel Steingrimsson: development
+
 Ezra Mendales: Motivation
 
 ## License
