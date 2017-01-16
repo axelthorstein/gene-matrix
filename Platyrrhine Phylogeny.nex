@@ -1,5 +1,5 @@
 #NEXUS
-[TITLE: output ]
+[TITLE: Platyrrhine Phylogeny ]
 
 begin data;
 dimensions ntax=105 nchar=9993;
