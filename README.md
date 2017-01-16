@@ -13,9 +13,9 @@ This program can be used to take a directory of fasta files and output a single 
 ## Code Example
 
 The code below is an example of usage where the fasta files are located in a directory called gene_files, the desired name of the output file is 'Platyrrhine Phylogeny', and the desired output format is nexus. 
-"""
-python gene_matrix.py gene_files --o "Platyrrhine Phylogeny" --type nexus
-"""
+''' shell
+gene_matrix.py gene_files --o "Platyrrhine Phylogeny" --type nexus
+'''
 
 ## Installation
 
