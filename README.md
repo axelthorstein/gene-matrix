@@ -1,10 +1,10 @@
-# super-matrix
+## Gene Matrix Builder
+
 A python program to build super matrices from gene sequences.
 
+## To-do
 
-# to-do
-Add as options: format datatype=DNA missing=N gap=- interleave=yes;
-	If missing or gap different then replace with specified variable
++ Add as options: format datatype=DNA missing=N gap=- interleave=yes; If missing or gap different then replace with specified variable
 
 ## Synopsis
 
