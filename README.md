@@ -1,6 +1,6 @@
 ## Gene Matrix Builder
 
-A python program to build super matrices from gene sequences.
+A python program to efficiently build a super matrix from gene sequences.
 
 ## To-do
 
@@ -8,7 +8,7 @@ A python program to build super matrices from gene sequences.
 
 ## Synopsis
 
-This program can be used to take a directory of fasta files and output a single file combining all the like genes for each individual species. 
+This program is designed to make phylogeny building more efficient by building a genetic super matrix automatically. The input is different fasta files each representing a single aligned gene for a number of species. The output is a single file that concatenates all the different genes into one file. If the different files do not have the same labels, the program will return an output file describing where the mis-label is occurring. The labels in each file do not have to be in the same order. The output can be defined into fasta, nexus, or phylip format depending on your step in your phylogenetic tree building. This can allow users to get to steps like PartitionFinder and MrBayes quicker to get to when building a phylogenetic tree using several genes.
 
 ## Code Example
 
