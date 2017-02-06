@@ -8,30 +8,14 @@ def concat_species_genes(filenames, dir_name, file_type, filename):
 		their genes. Then write each gene to the output file properly formatted. 
 	"""
 
-	header = ""
-
 	# Build a dictionary of species names and genes
 	names = build_species_dict(filenames, dir_name)
 
-	num_species = len(names.keys())
-	gene_length = len(next(names.itervalues()))
+	# Create Headers
+	header = create_headers(names, file_type, filename)
 
 	# Format names
-	if file_type == 'fasta':
-		formatted_names = format_names("fasta", names)
-	elif file_type == 'nexus':
-		header = create_header("#NEXUS\n[TITLE: {0} ]\n\nbegin data;\
-			\ndimensions ntax={1} nchar={2};\
-			\nformat datatype=DNA missing=N gap=- interleave=yes;\
-			\n\nMatrix\n", 
-		num_species, 
-		gene_length,
-		filename)
-		formatted_names = format_names("nexus", names)
-	elif file_type == 'phylip':
-		header = create_header(" {0} {1}\n", num_species, gene_length)
-		formatted_names = format_names("phylip", names)
-	
+	formatted_names = format_names(names, file_type)
 	formatted_names.sort()
 
 	# Write each species and gene line to an ouput text file.
@@ -43,8 +27,8 @@ def build_species_dict(filenames, dir_name):
 		the value is the concatentation of all the genes associated with 
 		that species. 
 	"""
+
 	names = {}
-	name = ''
 	num_names = 0
 	
 	# Concatenate all the genes associated to a species name
@@ -53,14 +37,7 @@ def build_species_dict(filenames, dir_name):
 		input_file = open(dir_name + '/' + filename, 'r')
 		lines = input_file.readlines()
 
-		for line in lines:
-
-			if line[0] == '>': 
-				name = line[1:]
-				if name not in names:
-					names[name] = ''
-			else:
-				names[name] += line.strip()
+		append_species(names, lines)
 
 		num_names = check_species_amount(names, filenames, filename, num_names)
 
@@ -68,49 +45,58 @@ def build_species_dict(filenames, dir_name):
 
 	return names
 
+def append_species(names, lines):
+	""" (dictionary, str) -> NoneType
+		Appends all of the species and genes from one file to a dictionary. 
+	"""
+
+	i = 0
+
+	while i < len(lines):
+
+		# Fasta files alternate species names and gene sequences
+		name = lines[i][1:].strip()
+		gene = lines[i + 1].strip()
+
+		if name not in names:
+			names[name] = gene
+		else:
+			names[name] += gene
+		i += 2
+
 def check_species_amount(names, filenames, filename, num_names):
 	""" (dict, list of str, str) -> int
 		Raise an exception if all of the files don't have the same amount
-		 of species names, which may suggest that there may be a spelling 
-		 error on one of the names. Otherwise return the number of species.
+		of species names, which may suggest that there may be a spelling 
+		error on one of the names. Otherwise return the number of species.
 	"""
 
 	if filename == filenames[0]:
 		num_names = len(names.keys())
 	elif num_names != len(names.keys()):
-		raise ValueError('One of the species names may be misspelled,\
-		 or have a different number of species names in ' + filename)
+		raise ValueError("One of the species names may be misspelled,\
+	or have a different number of species names in " + filename)
 
 	return num_names
 
-def format_names(file_type, names):
-	""" (dictionary) -> list
-		Format each species name and genes.
+def create_headers(names, file_type, filename):
+	""" (dict, str, str) -> str
+		Return the corresponding file header for the specified file type. 
 	"""
 
-	formatted_names = []
+	num_species = len(names.keys())
+	gene_length = len(next(names.itervalues()))
 
-	if file_type == 'fasta':
-		front = '>'
-		space = '\n'
-
-	elif file_type == 'nexus':
-		front = ''
-		longest_name_len = longest_name(names.keys()) + 5
-
+	if file_type == 'nexus':
+		header_format = "#NEXUS\n[TITLE: {0} ]\n\nbegin data;\ndimensions ntax={1} nchar={2};\
+			\nformat datatype=DNA missing=N gap=- interleave=yes;\n\nMatrix\n"
+		header = create_header(header_format, num_species, gene_length, filename)
 	elif file_type == 'phylip':
-		front = ''
-		space = ' '
-		
-	for key, value in names.items():
+		header = create_header(" {0} {1}\n", num_species, gene_length)
+	else:
+		header = ""
 
-		if file_type == 'nexus':
-			space = (longest_name_len - len(key)) * ' '
-
-		formatted_name = front + key.strip() + space + value.strip() + '\n'
-		formatted_names.append(formatted_name)
-
-	return formatted_names
+	return header
 
 def create_header(header_format, num_species, gene_length, filename=None):
 	""" (dict, str) -> str
@@ -124,18 +110,42 @@ def create_header(header_format, num_species, gene_length, filename=None):
 
 	return header
 
-def longest_name(names):
-	""" (list of str) -> int
-		Find the length of the longest_name in a list.
+def format_names(names, file_type):
+	""" (dictionary) -> list
+		Format each species name and genes.
 	"""
 
-	longest_name = 0
+	if file_type == 'fasta':
+		front = '>'
+		space = '\n'
 
-	for name in names:
-		if len(name) > longest_name:
-			longest_name = len(name)
+	elif file_type == 'nexus':
+		front = ''
+		space = (len(max(names, key=len)) + 5) *  ' '
 
-	return longest_name
+	elif file_type == 'phylip':
+		front = ''
+		space = ' '
+		
+	return create_names_list(names, file_type, front, space)
+
+def create_names_list(names, file_type, front, space):
+	""" (dictionary) -> list
+		Combine the newly formatted name and gene string pairs into a list.
+	"""
+	nexus_space = space
+	formatted_names = []
+
+	for key, value in names.items():
+
+		if file_type == 'nexus':
+			space = nexus_space[len(key):]
+
+		formatted_name = front + key + space + value + '\n'
+		formatted_names.append(formatted_name)
+
+	return formatted_names
+
 
 def open_file(file_type, filename):
 	""" (str, str) -> file
@@ -164,7 +174,7 @@ def write_genes(names, file_type, filename, header):
 		output_file.write(name)
 
 	if file_type == 'nexus':
-		# For fasta file endings
+		# For nexus file endings
 		output_file.write(";")
 
 	output_file.close()
