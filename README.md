@@ -4,7 +4,7 @@ A python program to efficiently build a super matrix from gene sequences.
 
 ## To-do
 
-+ Add as options: format datatype=DNA missing=N gap=- interleave=yes; If missing or gap different then replace with specified variable
++ Add error states for website. 
 
 ## Synopsis
 
@@ -15,7 +15,7 @@ This program is designed to make phylogeny building more efficient by building a
 The code below is an example of usage where the fasta files are located in a directory called gene_files, the desired name of the output file is 'Platyrrhine Phylogeny', and the desired output format is nexus. 
 
 ```shell
-gene_matrix.py gene_files --o "Platyrrhine Phylogeny" --type nexus
+python gene_matrix.py gene_files --o "Platyrrhine Phylogeny" --type nexus
 ```
 
 ## Installation
