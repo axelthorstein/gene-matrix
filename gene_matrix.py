@@ -29,55 +29,82 @@ def build_species_dict(filenames, dir_name):
 	"""
 
 	names = {}
-	num_names = 0
+	misspelled_species = []
 	
-	# Concatenate all the genes associated to a species name
+	# Concatenate all the genes associated to a species name.
 	for filename in filenames:
 
 		input_file = open(dir_name + '/' + filename, 'r')
 		lines = input_file.readlines()
 
-		append_species(names, lines)
-
-		num_names = check_species_amount(names, filenames, filename, num_names)
+		misspelled_species = append_species(filenames, filename, names, lines, misspelled_species)
 
 		input_file.close()
 
+	if misspelled_species:
+		misspelled_check(misspelled_species, filenames)
+
 	return names
 
-def append_species(names, lines):
+def append_species(filenames, filename, names, lines, misspelled_species):
 	""" (dictionary, str) -> NoneType
 		Appends all of the species and genes from one file to a dictionary. 
 	"""
 
-	i = 0
+	for line in lines:
 
-	while i < len(lines):
+		is_name = (line[0] == ">")
 
-		# Fasta files alternate species names and gene sequences
-		if lines[i][0] == ">":
-			name = lines[i][1:].strip()
+		if is_name:
+			name = line[1:].strip()
 
-		if name not in names:
+		# Use the species names from the inital file against all other files.
+		if filename == filenames[0]:
 			names[name] = ""
-		else:
-			names[name] += lines[i].strip()
-		i += 1
+		elif name in names.keys():
+			if is_name == False:
+				names[name] += line.strip()
+		elif is_name:
+			misspelled_species.append((name, filename))
 
-def check_species_amount(names, filenames, filename, num_names):
-	""" (dict, list of str, str) -> int
-		Raise an exception if all of the files don't have the same amount
-		of species names, which may suggest that there may be a spelling 
-		error on one of the names. Otherwise return the number of species.
+	return misspelled_species
+
+def misspelled_check(misspelled_species, filenames):
+	""" (list of str, list of str) -> NoneType
+		Check if there are a significant number of names misspelled in the same way. 
+		Because the spell checks use the first file as an example this could
+		indicate that the first file contains the spelling mistake and
+		not the remainder. In this case modify the misspelled list
+		to relfect this. 
 	"""
+	misspelled_names = [i[0] for i in misspelled_species]
+	print(misspelled_species)
 
-	if filename == filenames[0]:
-		num_names = len(names.keys())
-	elif num_names != len(names.keys()):
-		raise ValueError("One of the species names may be misspelled,\
-	or have a different number of species names in " + filename)
+	for name in misspelled_names:
 
-	return num_names
+		if misspelled_names.count(name) >= (len(filenames)/2):
+
+			for misspelled_name in misspelled_species:
+				if misspelled_name[0] == name:
+					misspelled_species.remove(misspelled_name)
+
+			misspelled_species.append((misspelled_name[0], filenames[0]))
+
+	misspelled_error(misspelled_species)
+
+def misspelled_error(misspelled_species):
+	""" (list of str) -> NoneType
+		Raise an exception if all of the files don't have the same amount
+		of species names, or if there may be a spelling 
+		error on one of the names. Output all the possible misspellings.
+	"""
+	error_message = ''
+
+	for species in misspelled_species:
+		error_message += (species[0] + ' in ' + species[1] + '\n')
+	
+	raise NameError("\nThe following species names may be misspelled,\n" +
+		"or have a different number of species names:\n" + error_message)
 
 def create_headers(names, file_type, filename):
 	""" (dict, str, str) -> str
