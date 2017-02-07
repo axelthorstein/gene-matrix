@@ -31,7 +31,7 @@ def build_species_dict(filenames, dir_name):
 	names = {}
 	misspelled_species = []
 	
-	# Concatenate all the genes associated to a species name.
+	# Concatenate all the genes associated to a species name. 
 	for filename in filenames:
 
 		input_file = open(dir_name + '/' + filename, 'r')
