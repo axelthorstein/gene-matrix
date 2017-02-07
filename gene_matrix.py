@@ -55,14 +55,14 @@ def append_species(names, lines):
 	while i < len(lines):
 
 		# Fasta files alternate species names and gene sequences
-		name = lines[i][1:].strip()
-		gene = lines[i + 1].strip()
+		if lines[i][0] == ">":
+			name = lines[i][1:].strip()
 
 		if name not in names:
-			names[name] = gene
+			names[name] = ""
 		else:
-			names[name] += gene
-		i += 2
+			names[name] += lines[i].strip()
+		i += 1
 
 def check_species_amount(names, filenames, filename, num_names):
 	""" (dict, list of str, str) -> int
