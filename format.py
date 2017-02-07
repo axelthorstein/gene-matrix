@@ -1,15 +1,14 @@
 #!/usr/bin/python
 
-import sys, getopt, os, argparse
-
 def format(filename):
-	""" (list of str, str, str) -> NoneType
-		
+	""" (str) -> NoneType
+		Formats a fasta file for that each gene is displayed 
+		over only a single line. 
 	"""
 
 	gene_sequences = []
 
-	input_file = open(filename, 'r')
+	input_file = open("unaligned_gene_files/" + filename, 'r')
 
 	output_filename = filename[0:-6] + "_formatted.fas"
 	output_file = open(output_filename, "w")
@@ -33,11 +32,3 @@ def format(filename):
 
 	input_file.close()
 	output_file.close()
-
-
-# if __name__ == '__main__':
-# 	parser = argparse.ArgumentParser(description='Combines single gene files into a combined fasta file.')
-# 	parser.add_argument('files', metavar='S', nargs='+',
-#                    help='A directory containing files with a single gene sequence')
-# 	args = parser.parse_args()
-# 	format(sys.argv[1])
