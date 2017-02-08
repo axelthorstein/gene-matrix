@@ -19,8 +19,8 @@ if __name__ == '__main__':
 
 	sys.stdout.write("Beginning sequence alignment...")
 	for gene_type in gene_types:
-		call(["./muscle", "-in", gene_type + ".fasta",  "-out", gene_type + "_aligned.fasta"])
-		format.format(gene_type + "_aligned.fasta")
+		call(["./muscle", "-in", "unaligned_gene_files/" + gene_type + ".fasta",  "-out", "aligned_gene_files/" + gene_type + ".fasta"])
+		format.format(gene_type + ".fasta")
 	sys.stdout.write("\nSequence alignment finished. \n")
 
 

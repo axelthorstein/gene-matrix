@@ -11,7 +11,6 @@ def combine_gene_sequences(filenames, dir_name):
 	gene_sequences = {}
 
 	for filename in filenames:
-		print(filename)
 
 		input_file = open(dir_name + '/' + filename, 'r')
 		lines = input_file.readlines()
@@ -67,8 +66,10 @@ def clean(header):
 
 	for item in header:
 		item = item.strip()
-		if item[0] == "(" and item[-1] == ")":
-			item = item[1:-1]
+		if item[0] == "(":
+			item = item[1:]
+		if item[-1] == ")":
+			item = item[:-1]
 		clean_header.append(item.strip())
 
 	return clean_header
@@ -80,7 +81,7 @@ def get_name(header):
 
 	name = header[0] + "_" + header[1]
 
-	if header[2] not in ["voucher", "isolate", "strain", "cytochrome", "clone", "interphotoreceptor", "mitochondrial"] and not any(char.isdigit() for char in header[2]):
+	if header[2] not in ["voucher", "isolate", "strain", "cytochrome", "clone", "interphotoreceptor", "mitochondrial", "specimen-voucher", "IRBP"] and not any(char.isdigit() for char in header[2]):
 		name += "_" + header[2]
 
 	return name
