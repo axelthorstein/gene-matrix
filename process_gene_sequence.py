@@ -8,6 +8,18 @@ if __name__ == '__main__':
 	args = parser.parse_args()
 	input_file_list = os.listdir(sys.argv[1])
 
+	if not os.path.exists("gene_files"):
+		os.makedirs("gene_files")
+	if not os.path.exists("gene_files/unaligned_gene_files"):
+		os.makedirs("gene_files/unaligned_gene_files")
+	if not os.path.exists("gene_files/aligned_gene_files"):
+		os.makedirs("gene_files/aligned_gene_files")
+	if not os.path.exists("gene_files/formatted_aligned_gene_files"):
+		os.makedirs("gene_files/formatted_aligned_gene_files")
+	unaligned = "gene_files/unaligned_gene_files"
+
+	aligned = "gene_files/aligned_gene_files"
+	formatted = "gene_files/formatted_aligned_gene_files"
 
 	# Check for '.DS_Store' on Macs
 	if '.DS_Store' in input_file_list:
@@ -18,13 +30,15 @@ if __name__ == '__main__':
 	sys.stdout.write("Combination finished.\n")
 
 	sys.stdout.write("Checking spelling.\n")
-	gene_matrix.build_species_dict(gene_types, "gene_files")
+	gene_matrix.build_species_dict(gene_types, unaligned)
 	sys.stdout.write("Spellcheck finished.\n")
 
 	sys.stdout.write("Beginning sequence alignment...")
 	for gene_type in gene_types:
-		call(["./muscle", "-in", "unaligned_gene_files/" + gene_type,  "-out", "aligned_gene_files/" + gene_type])
+		call(["./muscle", "-in", unaligned + '/' + gene_type,  "-out", aligned + '/' + gene_type])
 		format.format(gene_type)
 	sys.stdout.write("\nSequence alignment finished. \n")
 
-
+	sys.stdout.write("Creating super matrix...")
+	gene_matrix.concat_species_genes(gene_types, formatted, "fasta", "output")
+	sys.stdout.write("\nSuper matrix finished. \n")
