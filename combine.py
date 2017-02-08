@@ -2,7 +2,7 @@
 
 import sys, getopt, os, argparse
 
-def combine_gene_sequences(filenames, dir_name):
+def combine_gene_sequences(filenames, input_dir, output_dir):
 	""" (list of str, str) -> list of str
 		Combines the gene sequences from all the files in 
 		a given directory into a single file based on gene type.
@@ -12,7 +12,7 @@ def combine_gene_sequences(filenames, dir_name):
 
 	for filename in filenames:
 
-		input_file = open(dir_name + '/' + filename, 'r')
+		input_file = open(input_dir + '/' + filename, 'r')
 		lines = input_file.readlines()
 
 		gene_sequence = ""
@@ -37,10 +37,7 @@ def combine_gene_sequences(filenames, dir_name):
 
 		input_file.close()
 
-
-	write_genes(gene_sequences)
-
-
+	write_genes(gene_sequences, output_dir)
 
 	return gene_sequences.keys()
 
@@ -116,31 +113,44 @@ def get_genes(header):
 
 	return genes
 
-def write_genes(gene_sequences):
+def write_genes(gene_sequences, output_dir):
 	""" (dictionary) -> NoneType
 		Write each line of the species name and genes to an output file.
 	"""
 
 	for gene_type in gene_sequences.keys():
 
-		output_file = open("unaligned_gene_files/" + gene_type, "w")
+		output_file = open(output_dir + gene_type, "w")
 
 		for species in gene_sequences[gene_type]:
 			output_file.write(species)
 
 		output_file.close()
 
-# if __name__ == '__main__':
-# 	parser = argparse.ArgumentParser(description='Combines single gene files into a combined fasta file.')
-# 	parser.add_argument('files', metavar='S', nargs='+',
-#                    help='A directory containing files with a single gene sequence')
-# 	args = parser.parse_args()
-# 	input_file_list = os.listdir(sys.argv[1])
+if __name__ == '__main__':
+	parser = argparse.ArgumentParser(description='Combines single gene files into a combined fasta file.')
+	parser.add_argument('files', metavar='S', nargs='+',
+                   help='A directory containing files with a single gene sequence')
+	args = parser.parse_args()
 
+	input_dir = sys.argv[1]
+	output_dir = sys.argv[2]
 
-# 	# Check for '.DS_Store' on Macs
-# 	if '.DS_Store' in input_file_list:
-# 		input_file_list.remove('.DS_Store')
+	if input_dir[-1] != "/":
+		input_dir += "/"
+	if output_dir[-1] != "/":
+		output_dir += "/"
 
-# 	gene_types = combine_gene_sequences(input_file_list, sys.argv[1])
+	filenames = os.listdir(input_dir)
+	if not os.path.exists(output_dir):
+		os.makedirs(output_dir)
+
+	# Check for '.DS_Store' on Macs
+	if '.DS_Store' in filenames:
+		filenames.remove('.DS_Store')
+
+	# Combine the single gene files. 
+	sys.stdout.write("Combining single gene Sequences.\n")
+	gene_types = combine_gene_sequences(filenames, input_dir, output_dir)
+	sys.stdout.write("Combination finished.\n")
 

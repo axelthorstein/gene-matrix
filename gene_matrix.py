@@ -30,7 +30,6 @@ def build_species_dict(filenames, dir_name):
 
 	names = {}
 	species_occurences = {}
-
 	
 	# Concatenate all the genes associated to a species name. 
 	for filename in filenames:

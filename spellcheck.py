@@ -1,4 +1,4 @@
-import collections
+import collections, gene_matrix, sys, getopt, os, argparse
 
 def misspelled_check(misspelled_species, filenames):
 	""" (dict, list of str) -> NoneType
@@ -94,3 +94,25 @@ def misspelled_error(misspelled_pairs):
 	
 	raise NameError("\n\nThe following species names may be misspelled, " +
 		"or have a different number of species names:\n\n" + error_message)
+
+if __name__ == '__main__':
+	parser = argparse.ArgumentParser(description='Checks the spelling between multiple gene files.')
+	parser.add_argument('files', metavar='S', nargs='+',
+                   help='A directory containing files with the same amount of gene sequences')
+	args = parser.parse_args()
+	dirname = sys.argv[1]
+	filenames = os.listdir(dirname)
+
+	if input_dir[-1] != "/":
+		input_dir += "/"
+	if output_dir[-1] != "/":
+		output_dir += "/"
+
+	# Check for '.DS_Store' on Macs
+	if '.DS_Store' in filenames:
+		filenames.remove('.DS_Store')
+
+	# Check the spelling of the collected species names.
+	sys.stdout.write("Checking spelling.\n")
+	gene_matrix.build_species_dict(filenames, dirname)
+	sys.stdout.write("Spellcheck successful.\n")
