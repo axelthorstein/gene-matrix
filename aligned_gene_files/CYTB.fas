@@ -1366,7 +1366,7 @@ GGCCAAACCGCATCCATTATATACTTCTTCATTATTATTACCCTAATACCTCTTTTCGCC
 TTAATTGAAAATAAATTACTTAAATGATAA--GTCCTTGTAGTATAACTTAATACTCTGG
 TCTTGTAAACCAGAAATGGAAGTATTTACTCCCTAGGACACTCAGGGAAAGAATTCCTAT
 TCTAC----
->Aotus_azarai_infulatus
+>Aotus_azarae_infulatus
 ---------------------------------------------ATGACCTCCCCCCGC
 AAAACACACCCGCTAGCAAAGATCATTAACGAATCATTCATCGATCTCCCCACACCATCC
 AACATTTCCTCTTGATGAAATTTCGGCTCGCTCTTAGGCATTTGCCTAATCATTCAAATC
@@ -1390,7 +1390,7 @@ GGCCAGACCGCATCCATTATATACTTCTTCATTATCATTACCCTAATACCCCTTTTCGCC
 TTAATTGAAAATAAATTACTTAAATGATAG------------------------------
 ------------------------------------------------------------
 ---------
->Aotus_azarai_boliviensis
+>Aotus_azarae_boliviensis
 ---------------------------------------------ATGACTTCCCCCCGC
 AAAACACACCCACTAGCAAAGATCATTAACGAATCATTCATCGATCTCCCCACACCATCC
 AACATTTCCTCTTGATGAAATTTTGGCTCACTCTTAGGCATTTGCCTAATCATTCAAATC
@@ -1414,7 +1414,7 @@ GGCCAGACCGCATCCATTATATACTTCTTCATTATTATTACCCTAATACCCCTTTTCGCC
 TTAATTGAAAATAAATTACTTAAATGATAG------------------------------
 ------------------------------------------------------------
 ---------
->Aotus_azarai
+>Aotus_azarae
 ---------------------------------------------ATGACTTCNCCCCGC
 AAAACACACCCACTAGCAAAGATCATTAACGAATCATTCATCGATCTCCCCACACCATCC
 AACATTTCCTCTTGATGAAATTTTGGCTCACTCTTAGGCATTTGCCTAATCATTCAAATC
@@ -2110,7 +2110,7 @@ CCTATTCACTCT--CACAT-----------------------------------------
 ------------------------------------------------------------
 ------------------------------------------------------------
 ---------
->Callithrix_humeralifer
+>Callithrix_humeralifera
 ------------------------------------------------------------
 ------------------------------------------------------------
 ------------------------------------------------------------

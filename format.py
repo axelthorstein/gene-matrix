@@ -10,8 +10,7 @@ def format(filename):
 
 	input_file = open("aligned_gene_files/" + filename, 'r')
 
-	output_filename = filename[0:-6] + ".fas"
-	output_file = open("formatted_aligned_gene_files/" + output_filename, "w")
+	output_file = open("formatted_aligned_gene_files/" + filename, "w")
 
 	lines = input_file.readlines()
 

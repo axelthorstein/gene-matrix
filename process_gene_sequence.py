@@ -1,4 +1,4 @@
-import sys, getopt, os, argparse, format, combine
+import sys, getopt, os, argparse, format, combine, gene_matrix
 from subprocess import call
 
 if __name__ == '__main__':
@@ -17,10 +17,14 @@ if __name__ == '__main__':
 	gene_types = combine.combine_gene_sequences(input_file_list, sys.argv[1])
 	sys.stdout.write("Combination finished.\n")
 
+	sys.stdout.write("Checking spelling.\n")
+	gene_matrix.build_species_dict(gene_types, "gene_files")
+	sys.stdout.write("Spellcheck finished.\n")
+
 	sys.stdout.write("Beginning sequence alignment...")
 	for gene_type in gene_types:
-		call(["./muscle", "-in", "unaligned_gene_files/" + gene_type + ".fasta",  "-out", "aligned_gene_files/" + gene_type + ".fasta"])
-		format.format(gene_type + ".fasta")
+		call(["./muscle", "-in", "unaligned_gene_files/" + gene_type,  "-out", "aligned_gene_files/" + gene_type])
+		format.format(gene_type)
 	sys.stdout.write("\nSequence alignment finished. \n")
 
 

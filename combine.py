@@ -21,22 +21,26 @@ def combine_gene_sequences(filenames, dir_name):
 			if line[0] == ">":
 				name_gene = parse_header(line)
 				name = name_gene[0]
-				gene_type = name_gene[1]
+				gene_types = name_gene[1]
 			else:
 				gene_sequence += line.strip()
 
 		formated_sequence = ">" + name + "\n" + gene_sequence + "\n"
 
 
-		if gene_type not in gene_sequences.keys():
-			gene_sequences[gene_type] = [formated_sequence]
-		else:
-			gene_sequences[gene_type].append(formated_sequence)
+		for gene_type in gene_types:
+			gene_type = gene_type + ".fas"
+			if gene_type not in gene_sequences.keys():
+				gene_sequences[gene_type] = [formated_sequence]
+			else:
+				gene_sequences[gene_type].append(formated_sequence)
 
 		input_file.close()
 
 
 	write_genes(gene_sequences)
+
+
 
 	return gene_sequences.keys()
 
@@ -52,9 +56,9 @@ def parse_header(header):
 
 	name = get_name(header)
 
-	gene = get_gene(header)
+	genes = get_genes(header)
 
-	return (name, gene)
+	return (name, genes)
 
 def clean(header):
 	""" (list of str) -> str
@@ -70,6 +74,8 @@ def clean(header):
 			item = item[1:]
 		if item[-1] == ")":
 			item = item[:-1]
+		if "," in item:
+			item = item.replace(',', '')
 		clean_header.append(item.strip())
 
 	return clean_header
@@ -81,32 +87,34 @@ def get_name(header):
 
 	name = header[0] + "_" + header[1]
 
-	if header[2] not in ["voucher", "isolate", "strain", "cytochrome", "clone", "interphotoreceptor", "mitochondrial", "specimen-voucher", "IRBP"] and not any(char.isdigit() for char in header[2]):
+	if header[2] not in ["voucher", "isolate", "strain", "cytochrome", "clone", "interphotoreceptor", \
+	"mitochondrial", "specimen-voucher", "IRBP"] and not any(char.isdigit() for char in header[2]):
 		name += "_" + header[2]
 
 	return name
 
-def get_gene(header):
-	""" (list of str) -> str
+def get_genes(header):
+	""" (list of str) -> list of str
 		Gets the gene type and equalizes based on known variables and conventions. 
 	"""
 
-	if "gene," in header:
-		gene_index = header.index("gene,")
-	elif "gene" in header:
-		gene_index = header.index("gene")
+	genes = []
 
-	gene = header[gene_index - 1]
+	gene_indices = [i for i, item in enumerate(header) if item == "gene"]
 
-	gene = gene.upper()
+	for gene_index in gene_indices:
+		if "mitochondrial" != header[gene_index - 1]:
+			gene = header[gene_index - 1]
+			gene = gene.upper()
+			if "X" in gene:
+				gene = gene.replace("X", "")
+			if "1" in gene:
+				gene = gene.replace("1", "I")
+			if "2" in gene:
+				gene = gene.replace("2", "II")
+			genes.append(gene)
 
-	# remove the variable
-	if "X" in gene:
-		gene = gene.replace("X", "")
-	if "1" in gene:
-		gene = gene.replace("1", "I")
-
-	return gene
+	return genes
 
 def write_genes(gene_sequences):
 	""" (dictionary) -> NoneType
@@ -115,7 +123,7 @@ def write_genes(gene_sequences):
 
 	for gene_type in gene_sequences.keys():
 
-		output_file = open("unaligned_gene_files/" + gene_type + ".fasta", "w")
+		output_file = open("unaligned_gene_files/" + gene_type, "w")
 
 		for species in gene_sequences[gene_type]:
 			output_file.write(species)
