@@ -42,8 +42,8 @@ def build_species_dict(filenames, dir_name):
 		input_file.close()
 
 	misspelled_species = spellcheck.remove_correctly_spelled_species(species_occurences, len(filenames))
-
 	if misspelled_species:
+
 		spellcheck.misspelled_check(misspelled_species, filenames)
 
 	return names

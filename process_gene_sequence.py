@@ -65,7 +65,7 @@ if __name__ == '__main__':
 	if args.startstep == "spellcheck":
 		# Check the spelling of the collected species names.
 		sys.stdout.write("Checking spelling.\n")
-		gene_matrix.build_species_dict(filenames, unaligned)
+#		gene_matrix.build_species_dict(filenames, unaligned)
 		sys.stdout.write("Spellcheck finished.\n")
 		args.startstep = "align"
 
@@ -87,6 +87,8 @@ if __name__ == '__main__':
 		format.format(filenames, aligned, formatted)
 		sys.stdout.write("Formatting successful.\n")
 		args.startstep = "matrix"
+
+	# Add exta species. 
 
 	if args.startstep == "matrix":
 		# Create a super matrix based on the aligned genes. 
