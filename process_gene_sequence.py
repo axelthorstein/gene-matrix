@@ -1,5 +1,9 @@
 import sys, getopt, os, argparse, format, combine, gene_matrix
 from subprocess import call
+from multiprocessing import Pool
+
+def align(gene_type):
+	call(["./muscle", "-in", "gene_files/unaligned_gene_files" + '/' + gene_type,  "-out", "gene_files/aligned_gene_files" + '/' + gene_type])
 
 if __name__ == '__main__':
 
@@ -37,10 +41,10 @@ if __name__ == '__main__':
 	gene_matrix.build_species_dict(gene_types, unaligned)
 	sys.stdout.write("Spellcheck finished.\n")
 
-	# Align all of the sequences using the Muscle algorithm. 
+	# Align all of the sequences using the Muscle algorithm in a process pool. 
 	sys.stdout.write("Beginning sequence alignment...")
-	for gene_type in gene_types:
-		call(["./muscle", "-in", unaligned + '/' + gene_type,  "-out", aligned + '/' + gene_type])
+	pool = Pool(processes = (len(gene_types)/4) + 1)
+	pool.map(align, gene_types)
 	sys.stdout.write("\nSequence alignment finished. \n")
 
 	# Format all of the sequences. 

@@ -33,10 +33,12 @@ def pair_misspelled_species(misspelled_species, num_files):
 		as the key, and the potentially misspelled word as the value, along with
 		the file it was found in.  
 	"""
+	print(misspelled_species)
 
 	pairs = {}
 
 	for species in misspelled_species:
+		print(species)
 		# Indicating correct spelling.
 		if misspelled_species[species][0] >= num_files/2:
 			pairs[species] = []
@@ -100,13 +102,11 @@ if __name__ == '__main__':
 	parser.add_argument('files', metavar='S', nargs='+',
                    help='A directory containing files with the same amount of gene sequences')
 	args = parser.parse_args()
-	dirname = sys.argv[1]
-	filenames = os.listdir(dirname)
+	input_dir = sys.argv[1]
+	filenames = os.listdir(input_dir)
 
 	if input_dir[-1] != "/":
 		input_dir += "/"
-	if output_dir[-1] != "/":
-		output_dir += "/"
 
 	# Check for '.DS_Store' on Macs
 	if '.DS_Store' in filenames:
@@ -114,5 +114,6 @@ if __name__ == '__main__':
 
 	# Check the spelling of the collected species names.
 	sys.stdout.write("Checking spelling.\n")
-	gene_matrix.build_species_dict(filenames, dirname)
+
+	gene_matrix.build_species_dict(filenames, input_dir)
 	sys.stdout.write("Spellcheck successful.\n")
