@@ -1,5 +1,5 @@
 import sys, getopt, os, argparse
-from modules import format, combine, gene_matrix
+from modules import format, combine, gene_matrix, spellcheck
 from subprocess import call
 from multiprocessing import Pool
 
@@ -65,7 +65,7 @@ if __name__ == '__main__':
 	if args.startstep == "spellcheck":
 		# Check the spelling of the collected species names.
 		sys.stdout.write("Checking spelling.\n")
-		gene_matrix.build_species_dict(filenames, unaligned)
+		spellcheck.misspelled_check(filenames, unaligned)
 		sys.stdout.write("Spellcheck finished.\n")
 		args.startstep = "align"
 

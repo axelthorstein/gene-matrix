@@ -1,35 +1,41 @@
 import collections, gene_matrix, sys, getopt, os, argparse
 
-def misspelled_check(misspelled_species, filenames):
+def misspelled_check(filenames, dirname):
 	""" (dict, list of str) -> NoneType
 		Check if there are any species names misspelled and if so raise an error that 
 		displays which species names are misspelled, and what files the mistakes occur. 
 	"""
 
-	misspelled_pairs = pair_misspelled_species(misspelled_species, len(filenames))
+	# Gather all species occurrences
+	gene_matrix.species_occurences
+	species = gene_matrix.build_species_dict(filenames, dirname, gene_matrix.species_occurences)
 
-	raise_misspelled_error(misspelled_pairs, filenames)
+	misspelled_species = remove_correctly_spelled_species(species, len(filenames))
 
-def remove_correctly_spelled_species(species_occurences, num_files):
+	if misspelled_species:
+		misspelled_pairs = pair_misspelled_species(misspelled_species, len(filenames))
+		raise_misspelled_error(misspelled_pairs, filenames)
+
+def remove_correctly_spelled_species(species_occurrences, num_files):
 	""" (dict, int) -> dict
-		Check if the amount of occurences is equal to the number of files.
+		Check if the amount of occurrences is equal to the number of files.
 		If they are not equal this would imply there is a spelling mistake,
 		so remove all the correctly spelled names. 
 	"""
 
 	misspelled_species = {}
 
-	for species in species_occurences:
+	for species in species_occurrences:
 		# Indicating there are not spelling mistakes with this species.
-		if species_occurences[species][0] != num_files:
-			misspelled_species[species] = species_occurences[species]
+		if species_occurrences[species][0] != num_files:
+			misspelled_species[species] = species_occurrences[species]
 
 	return misspelled_species
 
 def pair_misspelled_species(misspelled_species, num_files):
 	""" (dict, int) -> dict
 		For each misspelled name compare the similarity to the other misspelled
-		names, if they are similar enough then add the name with more occurences
+		names, if they are similar enough then add the name with more occurrences
 		as the key, and the potentially misspelled word as the value, along with
 		the file it was found in.  
 	"""
@@ -119,11 +125,11 @@ if __name__ == '__main__':
 	parser.add_argument('files', metavar='S', nargs='+',
                    help='A directory containing files with the same amount of gene sequences')
 	args = parser.parse_args()
-	input_dir = sys.argv[1]
-	filenames = os.listdir(input_dir)
+	dirname = sys.argv[1]
+	filenames = os.listdir(dirname)
 
-	if input_dir[-1] != "/":
-		input_dir += "/"
+	if dirname[-1] != "/":
+		dirname += "/"
 
 	# Check for '.DS_Store' on Macs
 	if '.DS_Store' in filenames:
@@ -131,6 +137,5 @@ if __name__ == '__main__':
 
 	# Check the spelling of the collected species names.
 	sys.stdout.write("Checking spelling.\n")
-
-	gene_matrix.build_species_dict(filenames, input_dir)
+	misspelled_check(filenames, dirname)
 	sys.stdout.write("Spellcheck successful.\n")

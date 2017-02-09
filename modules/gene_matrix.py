@@ -9,7 +9,10 @@ def concat_species_genes(filenames, dir_name, file_type, filename):
 	"""
 
 	# Build a dictionary of species names and genes
-	names = build_species_dict(filenames, dir_name)
+	names = build_species_dict(filenames, dir_name, append_species)
+
+	# Check species name spelling. 
+	spellcheck.misspelled_check(filenames, dir_name)
 
 	# Create Headers
 	header = create_headers(names, file_type, filename)
@@ -21,34 +24,47 @@ def concat_species_genes(filenames, dir_name, file_type, filename):
 	# Write each species and gene line to an ouput text file.
 	write_genes(formatted_names, file_type, filename, header)
 
-def build_species_dict(filenames, dir_name):
+def build_species_dict(filenames, dir_name, species_func):
 	""" (list of str, str) -> dictionary
-		Builds a dictionary where the key is the name of the species and 
-		the value is the concatentation of all the genes associated with 
-		that species. 
+		Builds a dictionary based on all of the species in 
+		gene sequence fasta files. 
 	"""
 
-	names = {}
-	species_occurences = {}
-	
+	species = {}
+
 	# Concatenate all the genes associated to a species name. 
 	for filename in filenames:
 
 		input_file = open(dir_name + '/' + filename, 'r')
 		lines = input_file.readlines()
 
-		species_occurences = append_species(filenames, filename, names, lines, species_occurences)
+		species = species_func(filename, lines, species)
 
 		input_file.close()
 
-	misspelled_species = spellcheck.remove_correctly_spelled_species(species_occurences, len(filenames))
-	if misspelled_species:
+	return species
 
-		spellcheck.misspelled_check(misspelled_species, filenames)
+def species_occurences(filename, lines, species_occurences):
+	""" (str, list of str, dictionary) -> dictionary
+		Builds a dictionary where the key is the name of the species and 
+		the value is the number of occurences across all files and
+		the filenames in which it is found. 
+	"""
 
-	return names
+	for line in lines:
 
-def append_species(filenames, filename, names, lines, species_occurences):
+		if line[0] == ">":
+			species = line[1:].strip()
+
+		if species not in species_occurences:
+			species_occurences[species] = [1, [filename]]
+		elif line[0] == ">":
+			species_occurences[species][0] += 1
+			species_occurences[species][1].append(filename)
+
+	return species_occurences
+
+def append_species(filename, lines, names):
 	""" (dictionary, str) -> NoneType
 		Appends all of the species and genes from one file to a dictionary. 
 		Returns a list that holds all the occurences of a species. 
@@ -56,23 +72,15 @@ def append_species(filenames, filename, names, lines, species_occurences):
 
 	for line in lines:
 
-		is_name = (line[0] == ">")
-
-		if is_name:
+		if line[0] == ">":
 			name = line[1:].strip()
 
-		# Use the species_occurences names from the inital file against all other files.
 		if name not in names:
 			names[name] = ""
-			species_occurences[name] = [1, [filename]]
-		else:
-			if is_name == False:
-				names[name] += line.strip()
-			else:
-				species_occurences[name][0] += 1
-				species_occurences[name][1].append(filename)
+		elif line[0] != ">":
+			names[name] += line.strip()
 
-	return species_occurences
+	return names
 
 def create_headers(names, file_type, filename):
 	""" (dict, str, str) -> str
