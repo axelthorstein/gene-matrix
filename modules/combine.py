@@ -12,34 +12,50 @@ def combine_gene_sequences(filenames, input_dir, output_dir):
 
 	for filename in filenames:
 
+		# Open File
 		input_file = open(input_dir + '/' + filename, 'r')
 		lines = input_file.readlines()
 
-		gene_sequence = ""
+		# Gather one species information. 
+		species = get_species_info(lines)
 
-		for line in lines:
-			if line[0] == ">":
-				name_gene = parse_header(line)
-				name = name_gene[0]
-				gene_types = name_gene[1]
-			else:
-				gene_sequence += line.strip()
-
-		formated_sequence = ">" + name + "\n" + gene_sequence + "\n"
-
-
-		for gene_type in gene_types:
-			gene_type = gene_type + ".fas"
-			if gene_type not in gene_sequences.keys():
-				gene_sequences[gene_type] = [formated_sequence]
-			else:
-				gene_sequences[gene_type].append(formated_sequence)
-
+		# Add the formatted sequence to the dictionary.
+		catalogue_sequence(gene_sequences, species[0], species[1])
 		input_file.close()
 
 	write_genes(gene_sequences, output_dir)
 
 	return gene_sequences.keys()
+
+def get_species_info(lines):
+	""" (list of str) -> tuple
+		Get the species name and gene sequence from a single file. 
+	"""
+
+	gene_sequence = ""
+
+	for line in lines:
+		if line[0] == ">":
+			species_info = parse_header(line)
+		else:
+			gene_sequence += line.strip()
+
+	formated_sequence = ">" + species_info[0] + "\n" + gene_sequence + "\n"
+
+	return (species_info[1], formated_sequence)
+
+def catalogue_sequence(gene_sequences, gene_types, formated_sequence):
+	""" (dict, list of str, str) -> NoneType
+		For each gene that a species has add the formated sequence to the gene
+		sequence dictionary. 
+	"""
+	# In case one species sequence applies to multiple genes.
+	for gene_type in gene_types:
+		gene_type = gene_type + ".fas"
+		if gene_type not in gene_sequences.keys():
+			gene_sequences[gene_type] = [formated_sequence]
+		else:
+			gene_sequences[gene_type].append(formated_sequence)
 
 def parse_header(header):
 	""" (str) -> tuple
@@ -47,7 +63,8 @@ def parse_header(header):
 		species name, and the gene type for a single gene sequence.
 	"""
 	header = header.split()
-	header.pop(0)
+	if (any(char.isdigit() for char in header[0])):
+		header.pop(0)
 
 	header = clean(header)
 
@@ -59,20 +76,20 @@ def parse_header(header):
 
 def clean(header):
 	""" (list of str) -> str
-		Cleans each item in the header list of trailing puncuation,
-		and brackets, and returns a new list. 
+		Cleans each item in the header list of non-alphanumeric characters. 
 	"""
 
 	clean_header = []
 
 	for item in header:
-		item = item.strip()
-		if item[0] == "(":
-			item = item[1:]
-		if item[-1] == ")":
-			item = item[:-1]
-		if "," in item:
-			item = item.replace(',', '')
+		item = item.replace(',', '')
+		item = item.replace(')', '')
+		item = item.replace('(', '')
+		item = item.replace('|', '')
+		item = item.replace(';', '')
+		item = item.replace("2", "II")
+		item = item.replace("1", "I")
+		item = item.replace("X", "")
 		clean_header.append(item.strip())
 
 	return clean_header
@@ -103,12 +120,6 @@ def get_genes(header):
 		if "mitochondrial" != header[gene_index - 1]:
 			gene = header[gene_index - 1]
 			gene = gene.upper()
-			if "X" in gene:
-				gene = gene.replace("X", "")
-			if "1" in gene:
-				gene = gene.replace("1", "I")
-			if "2" in gene:
-				gene = gene.replace("2", "II")
 			genes.append(gene)
 
 	return genes
@@ -131,6 +142,10 @@ if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='Combines single gene files into a combined fasta file.')
 	parser.add_argument('files', metavar='S', nargs='+',
                    help='A directory containing files with a single gene sequence')
+	parser.add_argument('--in', 
+		help='Sepcify input file name')
+	parser.add_argument('--out', 
+		help='Sepcify output file name (default=output.fas)')
 	args = parser.parse_args()
 
 	input_dir = sys.argv[1]
