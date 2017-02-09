@@ -8,7 +8,6 @@ def generate_test_files(dirname):
 		for gene in gene_types:
 			file = open(dirname + name + gene + ".fas", "w")
 			head = header.format(name, gene)
-			print(head, gene, name)
 			file.write(head)
 			file.write(genes[i])
 			file.close()
@@ -18,6 +17,6 @@ def generate_test_files(dirname):
 				i += 1
 
 if __name__ == '__main__':
-	generate_test_files("generated_gene_files/")
+	generate_test_files("gene_files/generated_gene_files/")
 
 

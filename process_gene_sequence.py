@@ -65,7 +65,7 @@ if __name__ == '__main__':
 	if args.startstep == "spellcheck":
 		# Check the spelling of the collected species names.
 		sys.stdout.write("Checking spelling.\n")
-#		gene_matrix.build_species_dict(filenames, unaligned)
+		gene_matrix.build_species_dict(filenames, unaligned)
 		sys.stdout.write("Spellcheck finished.\n")
 		args.startstep = "align"
 
