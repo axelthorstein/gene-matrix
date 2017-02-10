@@ -24,6 +24,8 @@ A python program to efficiently build a super matrix from single gene sequence f
 
 + Look into retrieving gene files from database based on search. 
 
++ Change misspell varible names to include missing names. 
+
 ## Synopsis
 
 This program is designed to make phylogeny building more efficient by building a genetic super matrix automatically. The user can input several different fasta files each representing a single aligned gene for any number of species. The output is a single file that concatenates all the different genes into one file. If the different files do not have the same labels, the program will return an output file describing where the mis-label is occurring. The order of the genes in the concatenated file is the order that the separate files of aligned genes is uploaded to the program. The labels in each file do not have to be in the same order. The output can be defined into fasta, nexus, or phylip format depending on your step in your phylogenetic tree building. This can allow users to get to steps like PartitionFinder and MrBayes quicker to get to when building a phylogenetic tree using several genes.
