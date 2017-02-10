@@ -1,6 +1,6 @@
 ## Gene Matrix Builder
 
-A python program to efficiently build a super matrix from gene sequences.
+A python program to efficiently build a super matrix from single gene sequence files.
 
 ## To-do
 
