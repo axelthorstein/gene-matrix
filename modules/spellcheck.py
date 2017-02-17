@@ -42,14 +42,14 @@ def pair_misspelled_species(misspelled_species, num_files):
 	pairs = {}
 
 	for species in misspelled_species:
+		print species
 		# Indicating correct spelling.
-		if misspelled_species[species][0] >= num_files/2:
-			if misspelled_species[species][0] != num_files:
-				pairs[species] = []
-			for misspelled_name in misspelled_species:
-				similarity = levenshtein(species, misspelled_name)
-				if similarity <= len(species)/5 and similarity != 0:
-					pairs[species].append((misspelled_name, misspelled_species[misspelled_name][1]))
+		if misspelled_species[species][0] != num_files:
+			pairs[species] = []
+		for misspelled_name in misspelled_species:
+			similarity = levenshtein(species, misspelled_name)
+			if similarity <= len(species)/5 and similarity != 0:
+				pairs[species].append((misspelled_name, misspelled_species[misspelled_name][1]))
 
 	# Find missing names.
 	for pair in pairs:
