@@ -44,10 +44,10 @@ def pair_misspelled_species(misspelled_species, num_files):
 	for species in misspelled_species:
 		# Indicating correct spelling.
 		if misspelled_species[species][0] >= num_files/2:
-			pairs[species] = []
+			if misspelled_species[species][0] != num_files:
+				pairs[species] = []
 			for misspelled_name in misspelled_species:
 				similarity = levenshtein(species, misspelled_name)
-
 				if similarity <= len(species)/5 and similarity != 0:
 					pairs[species].append((misspelled_name, misspelled_species[misspelled_name][1]))
 
@@ -94,26 +94,33 @@ def raise_misspelled_error(misspelled_pairs, filenames):
 	error_message = ''
 	misspelled_error_format = '{0} may be misspelled as: \n'
 	missing_error_format = "The species {0} may be missing from the following file(s): \n"
+	duplicate_error_format = "The species {0} may be duplicated in the following file(s): \n"
 
 	for species in misspelled_pairs:
 		error = ""
 
-		if misspelled_pairs[species][0] == "":
-			# Take the files it exists in minus all of the files. 
-			files = set(misspelled_pairs[species][1]) ^ set(filenames)
-			files_missing_in = ""
-			for file in files:
-				files_missing_in += "	" + file + "\n"
-			error = missing_error_format.format(species) + files_missing_in
+		if len(misspelled_pairs[species]) > 1:
+			if len(misspelled_pairs[species][1]) >= len(filenames):
+				# Take all duplicate files.  
+				files = [file for i, file in enumerate(misspelled_pairs[species][1]) if file in misspelled_pairs[species][1][:i]]
+				duplicate_files = ""
+				for file in files:
+					duplicate_files += "	" + file + "\n"
+				error = duplicate_error_format.format(species) + duplicate_files
+
+			elif misspelled_pairs[species][0] == "":
+				# Take the files it exists in minus all of the files. 
+				files = set(misspelled_pairs[species][1]) ^ set(filenames)
+				files_missing_in = ""
+				for file in files:
+					files_missing_in += "	" + file + "\n"
+				error = missing_error_format.format(species) + files_missing_in
 			
 		else:
 			error = misspelled_error_format.format(species)
 
 			for misspelling in misspelled_pairs[species]:
-				print(misspelling)
 				error += "	" + misspelling[0] + " in the file(s) " + ", ".join(misspelling[1]) + "\n"
-
-		
 
 		error_message += error + '\n'
 	
