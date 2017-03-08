@@ -4,6 +4,14 @@ A python program to efficiently build a super matrix from single gene sequence f
 
 ## To-do
 
++ Take names from filenames.
+
++ Add missing species with N before matrix
+
++ Auto generate nexus and phylip if they are going to run partition finder
+
++ Ask for user input about nexus header information. 
+
 + Add error states for website. 
 
 + Bring all new functionality to website.
