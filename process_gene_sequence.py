@@ -13,7 +13,27 @@ def align(gene_type):
 	out_file = "gene_files/aligned_gene_files/" + gene_type
 	call(["./modules/muscle", "-in", in_file,  "-out", out_file])
 
+def input_args(message, options):
+	user_input = input(message + "\n" + str(options) + "\n")
+	if (options):
+		while user_input not in options:
+			user_input = input("Please only input one of the options: " + "\n" + str(options) + "\n")
+
+	return user_input
+
 if __name__ == '__main__':
+
+
+	startstep = input_args("Please enter step you would like to start with: ", ["combine", "spellcheck", "align", "format", "matrix"])
+	endstep = input_args("Please enter step you would like to start with: ", ["combine", "spellcheck", "align", "format", "matrix"])
+	output = input_args("Please ener output file name: (default=output.fas)", [])
+	type = input_args("Please enter output file type: ", ["fasta", "nexus", "phylip"])
+	filenames = input_args("Please enter the directory name that contains the gene files: \n", [])
+	pool = input_args("Would you like the sequencing to run concurrently?: \n[y, n]\n")
+	if pool == 'y':
+		pool = input_args("How many process would you like to run in the pool?: \n")
+	else:
+		pool = 1
 
 	# Parse the commandline arguments.
 	parser = argparse.ArgumentParser(description='Runs a process of step in combining, aligning, '+
@@ -34,19 +54,27 @@ if __name__ == '__main__':
 	args = parser.parse_args()
 	filenames = os.listdir(sys.argv[1])
 
-	# Set default parameters
-	if args.startstep is None:
-		args.startstep = "combine"
-	if args.endstep is None:
-		args.endstep = "matrix"
-	if args.pool is None:
-		args.pool = 1
-	if args.o is None:
-		args.o = 'output'
-	if args.type is None:
-		args.type = 'fasta'
+	startstep = args.startstep
+	endstep = args.endstep
+	output = args.o
+	type = args.type
+	filenames = args.filesnames
+	pool = int(args.pool)
 
-	args.o = check_file_ending(args.o)
+
+	# Set default parameters
+	if startstep is None:
+		startstep = "combine"
+	if endstep is None:
+		endstep = "matrix"
+	if pool is None:
+		pool = 1
+	if output is None:
+		output = 'output'
+	if type is None:
+		type = 'fasta'
+
+	output = check_file_ending(output)
 
 	# Create all the necessary directories.
 	parent_dir = os.getcwd() + "/"
@@ -66,47 +94,44 @@ if __name__ == '__main__':
 	if '.DS_Store' in filenames:
 		filenames.remove('.DS_Store')
 
-	if args.startstep == "combine":
+	if startstep == "combine":
 		# Combine the single gene files. 
 		sys.stdout.write("Combining single gene Sequences.\n")
 		filenames = combine.combine_gene_sequences(filenames, parent_dir + sys.argv[1], unaligned)
 		sys.stdout.write("Combination finished.\n")
-		if args.endstep != "combine":
-			args.startstep = "spellcheck"
+		if endstep != "combine":
+			startstep = "spellcheck"
 
-	if args.startstep == "spellcheck":
+	if startstep == "spellcheck":
 		# Check the spelling of the collected species names.
 		sys.stdout.write("Checking spelling.\n")
 		spellcheck.misspelled_check(filenames, unaligned)
 		sys.stdout.write("Spellcheck finished.\n")
-		if args.endstep != "spellcheck":
-			args.startstep = "align"
+		if endstep != "spellcheck":
+			startstep = "align"
 
-	if args.startstep == "align":
+	if startstep == "align":
 		# Align all of the sequences using the Muscle algorithm in a process pool. 
 		sys.stdout.write("Beginning sequence alignment...")
 		# Create a process pool.
-		if (args.pool):
-			pool = Pool(processes = int(args.pool))
-		else:
-			pool = Pool(processes = 1)
+		Pool(processes = 1)
 		pool.map(align, filenames)
 		sys.stdout.write("\nSequence alignment finished. \n")
-		if args.endstep != "align":
-			args.startstep = "format"
+		if endstep != "align":
+			startstep = "format"
 
-	if args.startstep == "format":
+	if startstep == "format":
 		# Format all of the sequences. 
 		sys.stdout.write("Formatting files.\n")
 		format.format(filenames, aligned, formatted)
 		sys.stdout.write("Formatting successful.\n")
-		if args.endstep != "format":
-			args.startstep = "matrix"
+		if endstep != "format":
+			startstep = "matrix"
 
 	# Add exta species. 
 
-	if args.startstep == "matrix":
+	if startstep == "matrix":
 		# Create a super matrix based on the aligned genes. 
 		sys.stdout.write("Creating super matrix...")
-		gene_matrix.concat_species_genes(filenames, formatted, args.type, args.o)
+		gene_matrix.concat_species_genes(filenames, formatted, type, output)
 		sys.stdout.write("\nSuper matrix finished. \n")
