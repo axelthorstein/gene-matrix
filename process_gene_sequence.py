@@ -76,23 +76,27 @@ if __name__ == '__main__':
 	
 	
 	# Get user input for program variables.
+	gene_modules = ["combine", "spellcheck", "align", "format", "matrix"]
 	if startstep == None:
-		startstep = input_args("Please enter step you would like to start with: ", ["combine", "spellcheck", "align", "format", "matrix"], "combine")
+		startstep = input_args("Please enter step you would like to start with: ", gene_modules, "combine")
+	if startstep == "combine":
+		species_parsing = input_args("Would you like the species names to be parse from the file header or file name? ", ["header", "filename"], "filename")
 	if endstep == None:
-		endstep = input_args("Please enter step you would like to end with: ", ["combine", "spellcheck", "align", "format", "matrix"], "matrix")
-	if output == None:
-		output = input_args("Please ener output file name: (default=output.fas)", [], "output.fas")
+		endstep = input_args("Please enter step you would like to end with: ", gene_modules, "matrix")
+	if output == None and gene_modules.index(endstep) == 4:
+		output = input_args("Please enter output file name: (default=output.fas)", [], "output.fas")
 	if type == None:
 		type = input_args("Please enter output file type: ", ["fasta", "nexus", "phylip"], "fasta")
 	if input_file == None:
 		input_file = input_args("Please enter the directory name that contains the gene files: ", [], "")
-	if pool == None:
-		pool = input_args("Would you like the alignment to run concurrently?: ", ["yes", "no"], "no")
-	if pool == 'yes':
-		pool = input_args("How many process would you like to run in the pool?: ", [], "1")
-		pool = int(pool)
-	else:
-		pool = 1
+	if gene_modules.index(startstep) <= 2 <= gene_modules.index(endstep):
+		if pool == None:
+			pool = input_args("Would you like the alignment to run concurrently?: ", ["yes", "no"], "no")
+		if pool == 'yes':
+			pool = input_args("How many process would you like to run in the pool?: ", [], "1")
+			pool = int(pool)
+		else:
+			pool = 1
 
 
 	# Get filenames from input directory.
@@ -134,17 +138,9 @@ if __name__ == '__main__':
 	if startstep == "combine":
 		# Combine the single gene files. 
 		sys.stdout.write("Combining single gene Sequences.\n")
-		filenames = combine.combine_gene_sequences(filenames, parent_dir + input_file, unaligned)
+		filenames = combine.combine_gene_sequences(filenames, parent_dir + input_file, unaligned, species_parsing)
 		sys.stdout.write("Combination finished.\n")
 		if endstep != "combine":
-			startstep = "spellcheck"
-
-	if startstep == "spellcheck":
-		# Check the spelling of the collected species names.
-		sys.stdout.write("Checking spelling.\n")
-		spellcheck.misspelled_check(filenames, unaligned)
-		sys.stdout.write("Spellcheck finished.\n")
-		if endstep != "spellcheck":
 			startstep = "align"
 
 	if startstep == "align":
@@ -152,7 +148,7 @@ if __name__ == '__main__':
 		sys.stdout.write("Beginning sequence alignment...")
 		# Create a process pool.
 		process_pool = Pool(processes = pool)
-		process_pool.map(align, filenames)
+		process_pool.map(unaligned, filenames)
 		sys.stdout.write("\nSequence alignment finished. \n")
 		if endstep != "align":
 			startstep = "format"
@@ -163,6 +159,14 @@ if __name__ == '__main__':
 		format.format(filenames, aligned, formatted)
 		sys.stdout.write("Formatting successful.\n")
 		if endstep != "format":
+			startstep = "spellcheck"
+
+	if startstep == "spellcheck":
+		# Check the spelling of the collected species names.
+		sys.stdout.write("Checking spelling.\n")
+		spellcheck.misspelled_check(filenames, formatted)
+		sys.stdout.write("Spellcheck finished.\n")
+		if endstep != "spellcheck":
 			startstep = "matrix"
 
 	# Add exta species. 

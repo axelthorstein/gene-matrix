@@ -8,7 +8,6 @@ def misspelled_check(filenames, dirname):
 	"""
 
 	# Gather all species occurrences
-	gene_matrix.species_occurences
 	species = gene_matrix.build_species_dict(filenames, dirname, gene_matrix.species_occurences)
 
 	misspelled_species = remove_correctly_spelled_species(species, len(filenames))
