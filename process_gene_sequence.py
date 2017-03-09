@@ -32,6 +32,7 @@ def input_args(message, options, default):
 	return user_input
 
 if __name__ == '__main__':
+	# if len(sys.argv) > 1:
 
 	# Parse the commandline arguments.
 	parser = argparse.ArgumentParser(description='Runs a process of step in combining, aligning, '+
@@ -150,7 +151,7 @@ if __name__ == '__main__':
 		sys.stdout.write("Beginning sequence alignment...")
 		# Create a process pool.
 		process_pool = Pool(processes = pool)
-		process_pool.map(unaligned, filenames)
+		process_pool.map(align, filenames)
 		sys.stdout.write("\nSequence alignment finished. \n")
 		if endstep != "align":
 			startstep = "format"
@@ -176,5 +177,5 @@ if __name__ == '__main__':
 	if startstep == "matrix":
 		# Create a super matrix based on the aligned genes. 
 		sys.stdout.write("Creating super matrix...")
-		gene_matrix.concat_species_genes(filenames, formatted, type, output)
+		gene_matrix.concat_species_genes(filenames, formatted, type, output, header_info)
 		sys.stdout.write("\nSuper matrix finished. \n")

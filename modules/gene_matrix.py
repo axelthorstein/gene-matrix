@@ -3,7 +3,7 @@
 import sys, getopt, os, argparse, collections
 from modules import spellcheck
 
-def concat_species_genes(filenames, dir_name, file_type, filename):
+def concat_species_genes(filenames, dir_name, file_type, filename, header_info):
 	""" (list of str, str, str, str) -> NoneType
 		Take in a list of filenames and for each new species concatenate all 
 		their genes. Then write each gene to the output file properly formatted. 
@@ -16,7 +16,7 @@ def concat_species_genes(filenames, dir_name, file_type, filename):
 	spellcheck.misspelled_check(filenames, dir_name)
 
 	# Create Headers
-	header = create_headers(names, file_type, filename)
+	header = create_headers(names, file_type, filename, header_info)
 
 	# Format names
 	formatted_names = format_names(names, file_type)
@@ -83,7 +83,7 @@ def append_species(filename, lines, names):
 
 	return names
 
-def create_headers(names, file_type, filename):
+def create_headers(names, file_type, filename, header_info):
 	""" (dict, str, str) -> str
 		Return the corresponding file header for the specified file type. 
 	"""
@@ -92,8 +92,14 @@ def create_headers(names, file_type, filename):
 	gene_length = len(next(iter(names.values())))
 
 	if file_type == 'nexus':
-		header_format = "#NEXUS\n[TITLE: {0} ]\n\nbegin data;\ndimensions ntax={1} nchar={2};\
-			\nformat datatype=DNA missing=N gap=- interleave=yes;\n\nMatrix\n"
+		if header_info:
+			header_info = header_info.split(" ")
+			header_format = "#NEXUS\n[TITLE: {0} ]\n\nbegin data;\ndimensions ntax={1} nchar={2};" + \
+				"\nformat datatype={0} missing={1} gap={2} interleave={3};\n\nMatrix\n".format(
+				header_info[0], header_info[1], header_info[2], header_info[3])
+		else:
+			header_format = "#NEXUS\n[TITLE: {0} ]\n\nbegin data;\ndimensions ntax={1} nchar={2};\
+				\nformat datatype=DNA missing=N gap=- interleave=yes;\n\nMatrix\n"
 		header = create_header(header_format, num_species, gene_length, filename)
 	elif file_type == 'phylip':
 		header = create_header(" {0} {1}\n", num_species, gene_length)
