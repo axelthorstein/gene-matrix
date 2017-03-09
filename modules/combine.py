@@ -110,7 +110,7 @@ def get_name(header, species_parsing):
 			name += "_" + header[2]
 	else:
 		name = os.path.splitext(os.path.basename(species_parsing))[0].split()
-		name = "_".join(name).lower()
+		name = "_".join(name)
 
 	return name
 

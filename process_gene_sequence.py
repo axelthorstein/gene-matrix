@@ -87,6 +87,8 @@ if __name__ == '__main__':
 		output = input_args("Please enter output file name: (default=output.fas)", [], "output.fas")
 	if type == None:
 		type = input_args("Please enter output file type: ", ["fasta", "nexus", "phylip"], "fasta")
+	if type == "nexus":
+		header_info = input_args("Please enter the datatype, missing character, gap character, and if it is interleaved, separated by spaces: (default= datatype=DNA missing=N gap=- interleave=yes)", [], "DNA N - yes")
 	if input_file == None:
 		input_file = input_args("Please enter the directory name that contains the gene files: ", [], "")
 	if gene_modules.index(startstep) <= 2 <= gene_modules.index(endstep):
