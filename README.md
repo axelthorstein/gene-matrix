@@ -45,15 +45,15 @@ This program is designed to make phylogeny building more efficient by building a
 The code below is an example of usage where the fasta files are located in a directory called gene_files, the desired name of the output file is 'Platyrrhine Phylogeny', and the desired output format is nexus. 
 
 ```shell
-python modules/combine.py gene_files/generated_gene_files
+python3 modules/combine.py --input gene_files/generated_gene_files
 
-python modules/spellcheck.py gene_files/aligned_gene_files
+python3 modules/spellcheck.py --input gene_files/aligned_gene_files
 
-python gene_matrix.py gene_files --o "Platyrrhine Phylogeny" --type nexus
+python3 gene_matrix.py --input gene_files --output "Platyrrhine Phylogeny" --type nexus
 
-python process_gene_sequence.py gene_files/generated_gene_files --o final.txt --type nexus --pool 4
+python3 process_gene_sequence.py --input gene_files/generated_gene_files --output final.txt --type nexus --pool 4
 
-python process_gene_sequence.py gene_files/unaligned_gene_files --o final.txt --type nexus --pool 4 --startstep align --endstep format
+python3 process_gene_sequence.py --input gene_files/unaligned_gene_files --output final.txt --type nexus --pool 4 --startstep align --endstep format
 ```
 
 ## Installation

@@ -1,4 +1,5 @@
-import collections, gene_matrix, sys, getopt, os, argparse
+import collections, sys, getopt, os, argparse
+from modules import gene_matrix
 
 def misspelled_check(filenames, dirname):
 	""" (dict, list of str) -> NoneType
@@ -42,7 +43,6 @@ def pair_misspelled_species(misspelled_species, num_files):
 	pairs = {}
 
 	for species in misspelled_species:
-		print species
 		# Indicating correct spelling.
 		if misspelled_species[species][0] != num_files:
 			pairs[species] = []

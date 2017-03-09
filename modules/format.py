@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
-import collections, gene_matrix, sys, getopt, os, argparse
+import collections, sys, getopt, os, argparse
+from modules import gene_matrix
+
 
 def format(filenames, input_dir, output_dir):
 	""" (str) -> NoneType

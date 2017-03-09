@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
-import sys, getopt, os, argparse, collections, spellcheck
+import sys, getopt, os, argparse, collections
+from modules import spellcheck
 
 def concat_species_genes(filenames, dir_name, file_type, filename):
 	""" (list of str, str, str, str) -> NoneType
@@ -88,7 +89,7 @@ def create_headers(names, file_type, filename):
 	"""
 
 	num_species = len(names.keys())
-	gene_length = len(next(names.itervalues()))
+	gene_length = len(next(names.values()))
 
 	if file_type == 'nexus':
 		header_format = "#NEXUS\n[TITLE: {0} ]\n\nbegin data;\ndimensions ntax={1} nchar={2};\
