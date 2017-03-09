@@ -89,7 +89,7 @@ def create_headers(names, file_type, filename):
 	"""
 
 	num_species = len(names.keys())
-	gene_length = len(next(names.values()))
+	gene_length = len(next(iter(names.values())))
 
 	if file_type == 'nexus':
 		header_format = "#NEXUS\n[TITLE: {0} ]\n\nbegin data;\ndimensions ntax={1} nchar={2};\

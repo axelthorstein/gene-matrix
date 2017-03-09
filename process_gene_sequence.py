@@ -18,7 +18,7 @@ def input_args(message, options, default):
 	else:
 		user_input = input(message + "\n")
 
-	if user_input == "" && options == []:
+	if user_input == "" and default != "":
 		return default
 
 	if options:
@@ -57,8 +57,9 @@ if __name__ == '__main__':
 	endstep = args.endstep
 	output = args.output
 	type = args.type
-	if (args.pool):
-		pool = int(args.pool)
+	pool = args.pool
+	if pool:
+		pool = int(pool)
 
 	# Welcome messages
 	columns = shutil.get_terminal_size().columns
@@ -75,7 +76,6 @@ if __name__ == '__main__':
 	
 	
 	# Get user input for program variables.
-	print(startstep)
 	if startstep == None:
 		startstep = input_args("Please enter step you would like to start with: ", ["combine", "spellcheck", "align", "format", "matrix"], "combine")
 	if endstep == None:
@@ -90,6 +90,7 @@ if __name__ == '__main__':
 		pool = input_args("Would you like the sequencing to run concurrently?: ", ["yes", "no"], "no")
 	if pool == 'yes':
 		pool = input_args("How many process would you like to run in the pool?: ", [], "1")
+		pool = int(pool)
 	else:
 		pool = 1
 
@@ -133,7 +134,6 @@ if __name__ == '__main__':
 	if startstep == "combine":
 		# Combine the single gene files. 
 		sys.stdout.write("Combining single gene Sequences.\n")
-		print(filenames, parent_dir + input_file, unaligned)
 		filenames = combine.combine_gene_sequences(filenames, parent_dir + input_file, unaligned)
 		sys.stdout.write("Combination finished.\n")
 		if endstep != "combine":
@@ -152,7 +152,6 @@ if __name__ == '__main__':
 		sys.stdout.write("Beginning sequence alignment...")
 		# Create a process pool.
 		process_pool = Pool(processes = pool)
-		print(process_pool)
 		process_pool.map(align, filenames)
 		sys.stdout.write("\nSequence alignment finished. \n")
 		if endstep != "align":
