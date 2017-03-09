@@ -87,7 +87,7 @@ if __name__ == '__main__':
 	if input_file == None:
 		input_file = input_args("Please enter the directory name that contains the gene files: ", [], "")
 	if pool == None:
-		pool = input_args("Would you like the sequencing to run concurrently?: ", ["yes", "no"], "no")
+		pool = input_args("Would you like the alignment to run concurrently?: ", ["yes", "no"], "no")
 	if pool == 'yes':
 		pool = input_args("How many process would you like to run in the pool?: ", [], "1")
 		pool = int(pool)
