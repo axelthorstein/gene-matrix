@@ -14,7 +14,9 @@ def misspelled_check(filenames, dirname):
 
 	if misspelled_species:
 		misspelled_pairs = pair_misspelled_species(misspelled_species, len(filenames))
-		raise_misspelled_error(misspelled_pairs, filenames)
+		missing_species = raise_misspelled_error(misspelled_pairs, filenames)
+
+	return missing_species
 
 def remove_correctly_spelled_species(species_occurrences, num_files):
 	""" (dict, int) -> dict
@@ -90,6 +92,7 @@ def raise_misspelled_error(misspelled_pairs, filenames):
 		of species names, or if there may be a spelling 
 		error on one of the names. Output all the possible misspellings.
 	"""
+	should_raise_error = False
 	error_message = ''
 	misspelled_error_format = '{0} may be misspelled as: \n'
 	missing_error_format = "The species {0} may be missing from the following file(s): \n"
@@ -100,6 +103,7 @@ def raise_misspelled_error(misspelled_pairs, filenames):
 
 		if len(misspelled_pairs[species]) > 1:
 			if len(misspelled_pairs[species][1]) >= len(filenames):
+				should_raise_error = True
 				# Take all duplicate files.  
 				files = [file for i, file in enumerate(misspelled_pairs[species][1]) if file in misspelled_pairs[species][1][:i]]
 				duplicate_files = ""
@@ -116,15 +120,19 @@ def raise_misspelled_error(misspelled_pairs, filenames):
 				error = missing_error_format.format(species) + files_missing_in
 			
 		else:
+			should_raise_error = True
 			error = misspelled_error_format.format(species)
 
 			for misspelling in misspelled_pairs[species]:
 				error += "	" + misspelling[0] + " in the file(s) " + ", ".join(misspelling[1]) + "\n"
 
 		error_message += error + '\n'
-	
-	raise NameError("\n\nThe following species names may be misspelled, " +
-		"or have a different number of species names:\n\n" + error_message)
+
+	if should_raise_error:
+		raise NameError("\n\nThe following species names may be misspelled, " +
+			"or have a different number of species names:\n\n" + error_message)
+	else:
+		return misspelled_pairs
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='Checks the spelling between multiple gene files.')

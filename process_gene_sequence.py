@@ -167,7 +167,9 @@ if __name__ == '__main__':
 	if startstep == "spellcheck":
 		# Check the spelling of the collected species names.
 		sys.stdout.write("Checking spelling.\n")
-		spellcheck.misspelled_check(filenames, formatted)
+		missing_species = spellcheck.misspelled_check(filenames, formatted)
+		if missing_species:
+			
 		sys.stdout.write("Spellcheck finished.\n")
 		if endstep != "spellcheck":
 			startstep = "matrix"
